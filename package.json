@@ -1,0 +1,18 @@
+{
+  "name": "nusadev-bot",
+  "version": "1.0.0",
+  "description": "Asisten Discord untuk server komunitas Indonesia.",
+  "main": "server.js",
+  "dependencies": {
+    "@discordjs/builders": "^1.0.0",
+    "@discordjs/rest": "^1.0.0",
+    "discord-api-types": "^0.29.0",
+    "discord.js": "^14.18.0",
+    "dotenv": "^10.0.0",
+    "mysql2": "^3.14.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "deploy": "node deploy-commands.js"
+  }
+}
