@@ -1,9 +1,27 @@
 const fs = require('fs');
 const path = require('path');
 const { InteractionType } = require('discord.js');
+const { getGuildSettings } = require('../../utils/guildSettings'); // Pastikan kamu import fungsi untuk mengambil pengaturan guild
 
-module.exports.handleCommands = (client, message) => {
-  const prefix = client.config.prefix;
+module.exports.handleCommands = async (client, message) => {
+  // Ambil guildId dari message
+  const guildId = message.guild.id;
+  
+  // Ambil pengaturan guild dari client.guildConfigs
+  let guildSettings = client.guildConfigs.get(guildId);
+  // Jika pengaturan guild belum ada di client.guildConfigs, ambil dari database
+  if (!guildSettings) {
+    guildSettings = await getGuildSettings(guildId);
+    if (!guildSettings) {
+      // Jika pengaturan guild tidak ada di database, beri peringatan
+      message.reply('⚠️ | Pengaturan guild ini belum ada. Harap konfigurasi terlebih dahulu.');
+      return;
+    }
+    // Simpan pengaturan guild ke client.guildConfigs untuk penggunaan berikutnya
+    client.guildConfigs.set(guildId, guildSettings);
+  }
+
+  const prefix = guildSettings.prefix || client.config.prefix;
   // Check if it's an interaction (slash command)
   if (message.type === InteractionType.ApplicationCommand) {
       // Pastikan yang dikirim adalah perintah berbasis interaksi
@@ -27,15 +45,15 @@ module.exports.handleCommands = (client, message) => {
               command.execute(message, message.options, client);
             } else {
               message.reply({
-                content: '❌ Command tidak memiliki fungsi `execute`.',
+                content: '❌ | Command tidak memiliki fungsi `execute`.',
                 ephemeral: true,
               });
             }
             commandFound = true;
           } catch (error) {
-            console.error(`❌ Error pada command ${commandName}:`, error);
+            console.error(`❌ | Error pada command ${commandName}:`, error);
             message.reply({
-              content: '❌ Terjadi kesalahan saat menjalankan command.',
+              content: '❌ | Terjadi kesalahan saat menjalankan command.',
               ephemeral: true,
             });
           }

@@ -1,8 +1,8 @@
-// server.js
-require('dotenv').config(); // Memastikan .env sudah dimuat
-const config = require('./config'); // Pastikan path ke file config.js benar
-const { Client, GatewayIntentBits } = require('discord.js');
-const handleEvents = require('./functions/handlers/handleEvents'); // Memastikan jalur relatifnya benar
+require('dotenv').config();
+const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const config = require('./config');
+const handleEvents = require('./functions/handlers/handleEvents');
+const db = require('./database/connect');
 
 // Membuat objek client dengan intents yang diperlukan
 const client = new Client({
@@ -15,11 +15,13 @@ const client = new Client({
   ]
 });
 
-// Menambahkan konfigurasi ke objek client
+// Tambahkan properti tambahan ke client
 client.config = config;
+client.db = db;
+client.guildConfigs = new Collection(); // Untuk menyimpan setting per-guild di cache
 
 // Memanggil event handler setelah bot berhasil dibuat
 handleEvents(client);
 
 // Login ke Discord menggunakan token yang disimpan di .env
-client.login(process.env.DISCORD_TOKEN);
+client.login(config.token);
