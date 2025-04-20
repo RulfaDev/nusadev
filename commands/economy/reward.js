@@ -7,7 +7,7 @@ module.exports = {
     .setDescription('Klaim reward harian dari sistem supply'),
 
   async execute(interaction) {
-    const userId = interaction.user.id;
+    const userId = interaction.member.user.id;
 
     try {
       // Cek apakah user sudah memiliki wallet
