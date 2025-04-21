@@ -21,7 +21,7 @@ module.exports = {
         // User does not have a wallet, create a new one
         const walletAddress = crypto.randomBytes(16).toString('hex');
         
-        await connection.promise().query(
+        await connection.query(
           'INSERT INTO users (discord_id, wallet_address, balance) VALUES (?, ?, ?)',
           [userId, walletAddress, 0]
         );

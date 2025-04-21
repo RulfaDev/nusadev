@@ -51,13 +51,27 @@ module.exports = {
 
 
       // Tentukan jumlah reward
-      let rewardAmount = 0.00010;
+      let rewardAmount = 0.0; // Default reward
+      let messages = [];
 
       // 1% chance untuk dapat reward besar
       const luckyDraw = Math.random();
-      if (luckyDraw <= 0.01) {
-        // Random reward antara 0.00010 sampai 0.00100
-        rewardAmount = parseFloat((Math.random() * (0.00100 - 0.00010) + 0.00010).toFixed(5));
+      if (luckyDraw <= 0.0005) { // 0.05% chance
+        rewardAmount = 0.0001000000; // Reward sangat besar
+        messages.push(`🎉 [Legendary] Selamat Kamu Sangat Beruntung Sekali!`);
+      } else if (luckyDraw <= 0.005) { // 0.5% chance untuk reward besar
+        rewardAmount = 0.0000100000; // Reward besar
+        messages.push(`🎉 [Epic] Selamat Kamu Sangat Beruntung!`);
+      } else if(luckyDraw <= 0.05) { // 5% chance untuk reward sedang
+        rewardAmount = Number((Math.random() * (0.0000050000 - 0.0000010000) + 0.0000010000).toFixed(10));
+        messages.push(`🎉 [Master] Selamat Kamu Begitu Berungtung!`);
+      } else if(luckyDraw <= 0.10) { // 10% chance untuk reward kecil
+        rewardAmount = Number((Math.random() * (0.0000050000 - 0.0000001000) + 0.0000001000).toFixed(10));
+        messages.push(`🎉 [Elite] Selamat Kamu Beruntung! `);
+      } else {
+        // sisa untuk reward normal
+        messages.push(`🎉 [Normal] Selamat!`);
+        rewardAmount = Number((Math.random() * (0.0000010000 - 0.0000000100) + 0.0000000100).toFixed(10));
       }
 
       // Cari supply yang mencukupi
@@ -75,13 +89,20 @@ module.exports = {
 
       const selectedSupply = supplyRows[0];
 
+      const formattedReward = rewardAmount.toLocaleString('en-US', {
+        minimumFractionDigits: 10,
+        maximumFractionDigits: 10,
+      });
+
       // Transaksi: kurangi supply, tambah user, log ke reward_logs
       await connection.query('START TRANSACTION');
+
+      console.log(`Penambangan Suplai #${selectedSupply.id}:`, formattedReward);
 
       // Kurangi dari supply
       await connection.query(
         'UPDATE supplys SET balance = balance - ? WHERE id = ?',
-        [rewardAmount, selectedSupply.id]
+        [formattedReward, selectedSupply.id]
       );
 
       // Tambah ke user
@@ -98,8 +119,12 @@ module.exports = {
       
       await connection.query('COMMIT');
 
+      // Pesan utama klaim reward
+      messages.push(`🎉 Kamu berhasil klaim **${formattedReward} coins** dari supply blcok #${selectedSupply.id}!\nCoba lagi besok untuk peluang lebih besar!`);
+
+      // Gabungkan semua pesan jadi satu dan kirim
       return interaction.reply({
-        content: `🎉 Kamu berhasil klaim **${rewardAmount} coins** dari supply #${selectedSupply.id}!\nCoba lagi besok untuk peluang lebih besar!`,
+        content: messages.join('\n'),
         flags: 64,
       });
 

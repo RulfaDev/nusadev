@@ -27,7 +27,7 @@ module.exports = {
         return `**${index + 1}.** ${tag} — 💰 ${row.balance} coins`;
       }).join('\n');
 
-    await interaction.reply({
+    const reply = await interaction.reply({
         embeds: [{
             title: '🏆 Leaderboard Ekonomi',
             description: leaderboardText,
@@ -38,8 +38,6 @@ module.exports = {
             },
         }],
     });
-
-    const reply = await interaction.fetchReply();
 
     setTimeout(() => {
         reply.delete().catch(console.error);

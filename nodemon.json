@@ -1,0 +1,9 @@
+{
+  "watch": ["commands", "events", "server.js"],
+  "ext": "js,json",
+  "ignore": ["data.json", "README.md"],
+  "exec": "node server.js",
+  "events": {
+    "restart": "node deploy-commands.js"
+  }
+}
